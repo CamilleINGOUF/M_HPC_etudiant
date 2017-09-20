@@ -19,6 +19,12 @@ int FibonacciMod42(int N)
     return f_curr;
 }
 
+void calculeTabThread(std::vector<int> & tab, int nbDataDebut, int nbDataFin)
+{
+  for (int i = nbDataDebut; i <= nbDataFin; i+=2)
+    tab[i] = (FibonacciMod42(i));
+}
+
 int main(int argc, char ** argv)
 {
     // verifie les arguments de la ligne de commande
@@ -30,10 +36,27 @@ int main(int argc, char ** argv)
 
     // cree le tableau de donnees a calculer
     int nbData = std::stoi(argv[1]);
-    std::vector<int> data(nbData); 
+    std::vector<int> data(nbData);
+
+    //début chrono
+    std::chrono::time_point<std::chrono::system_clock> startTime
+        = std::chrono::system_clock::now();
 
     // calcule le tableau de donnees 
-	// TODO
+    // calculeTab(data, nbData);
+    std::thread t1(calculeTabThread,std::ref(data),0,nbData);
+    std::thread t2(calculeTabThread,std::ref(data),1,nbData);
+
+    t1.join();
+    t2.join();
+    
+    //fin chrono
+    std::chrono::time_point<std::chrono::system_clock> endTime
+        = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> nbSeconds = endTime - startTime;
+
+    std::cout << "temps de calcul = " << nbSeconds.count() << std::endl;
 
     // ecrit les donnees calculees dans un fichier
     std::ofstream ofs("output.txt");
