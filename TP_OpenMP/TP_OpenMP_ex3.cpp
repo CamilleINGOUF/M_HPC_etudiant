@@ -57,11 +57,11 @@ std::vector<unsigned char> computeConvolutionSequential(
 }
 
 std::vector<unsigned char> computeConvolutionParallel(
-        std::vector<unsigned char> & data1, int /*width*/, int /*height*/)
+        std::vector<unsigned char> & data1, int width, int height)
 {
     std::vector<unsigned char> data2(data1);
     // kernel 
-    /*
+    
     const int sk = 256;      // sum of all kernel coefs
     const int dk = 5;        // kernel size
     const int dk2 = dk/2;    // kernel half-size
@@ -73,23 +73,58 @@ std::vector<unsigned char> computeConvolutionParallel(
         { 4, 16, 24, 16,  4},
         { 1,  4,  6,  4,  1}
     };
-    */
+    
 
     // TODO
+#pragma omp parallel
+    {
+#pragma omp for
+      for (int x=dk2; x<width-dk2; x++)
+      {
+        for (int y=dk2; y<height-dk2; y++)
+	  {
+            int p = 0;
+	    for (int k=0; k<dk; k++)
+	      {
+                for (int l=0; l<dk; l++)
+		  {
+                    p += kernel[k][l] * ind(data1, width, x-dk2+k, y-dk2+l);
+		  }
+	      }
+            ind(data2, width, x, y) = p / sk;
+	  }
+      }
+    }
     return data2;
 }
 
 std::vector<unsigned char> computeConvolutionSeparate(
-        std::vector<unsigned char> & data1, int /*width*/, int /*height*/)
+        std::vector<unsigned char> & data1, int width, int height)
 {
     std::vector<unsigned char> data2(data1);
     // kernel 
-    /*
     const int sk = 16;       // sum of all kernel coefs
     const int dk = 5;        // kernel size
     const int dk2 = dk/2;    // kernel half-size
     const int kernel[dk] = { 1,  4,  6,  4,  1 };
-    */
+
+    //TODO changer algo
+    /*for (int x=dk2; x<width-dk2; x++)
+      {
+        for (int y=dk2; y<height-dk2; y++)
+	  {
+            int p = 0;
+	    for (int k=0; k<dk; k++)
+	      {
+                for (int l=0; l<dk; l++)
+		  {
+                    p += kernel[k][l] * ind(data1, width, x-dk2+k, y-dk2+l);
+		  }
+	      }
+            ind(data2, width, x, y) = p / sk;
+	  }
+	  }*/
+
 
     // TODO
     return data2;

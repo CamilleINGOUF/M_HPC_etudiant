@@ -38,20 +38,26 @@ int main(int argc, char ** argv)
     double startTime = omp_get_wtime();
 
     // compute image data
-    // TODO
-    for (int x=0; x<width; x++)
+    //TODO
+#pragma omp parallel num_threads(3)
     {
-        for (int y=0; y<height; y++)
-        {
-            // diagonal gradient
-            // TODO remove that
-            double t = (x+y) / sqrt(width*width + height*height);
-            double f = 2.0;
-            ind(x,y) = 127.0 * (1 + cos(2.0*M_PI*f*t));
-
-            // put the color of the thread
-            // TODO
-        }
+#pragma omp for schedule(static,50)
+      for (int x=0; x<width; x++)
+	{
+	  
+	  for (int y=0; y<height; y++)
+	    {
+	      // diagonal gradient
+	      // TODO remove that
+	      /*double t = (x+y) / sqrt(width*width + height*height);
+	      double f = 2.0;
+	      ind(x,y) = 127.0 * (1 + cos(2.0*M_PI*f*t));
+	      */
+	      // put the color of the thread
+	      // TODO
+	      ind(x,y) = 127.0 * omp_get_thread_num(); 
+	    }
+	}
     }
 
     // stop chrono
