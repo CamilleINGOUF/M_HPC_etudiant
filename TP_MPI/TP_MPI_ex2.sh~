@@ -1,6 +1,6 @@
 #!/bin/sh
-NB_THREADS=10
-STEP=0.000001
+NB_THREADS=20
+STEP=0.001
 DAT_FILE=ex2.dat
 OUT_FILE=./TP_MPI_ex2b.out
 SVG_FILE=ex2_scalability.svg

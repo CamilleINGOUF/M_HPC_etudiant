@@ -16,8 +16,8 @@ int main(int argc, char ** argv)
         std::cout << "Usage: " << argv[0] << " <iPlatform> <iDevice> <dataSize> [outputFile]" << std::endl;
         exit(-1);
     }
-    unsigned iPlatform = std::stoi(argv[1]);
-    unsigned iDevice = std::stoi(argv[2]);
+    //unsigned iPlatform = std::stoi(argv[1]);
+    //unsigned iDevice = std::stoi(argv[2]);
     int dataSize = std::stoi(argv[3]);;
     const char * outputFilename = argc == 5 ? argv[4] : nullptr;
 
@@ -31,65 +31,16 @@ int main(int argc, char ** argv)
         dataX[k] = rng.rand();
         dataY[k] = rng.rand();
     }
-    int dataFullSize = dataSize * sizeof(float);
+    //int dataFullSize = dataSize * sizeof(float);
     std::vector<float> dataZ(dataSize);
 
     opencHelp::Chrono chrono;
 
     // compute
-    /*#pragma omp parallel for
+#pragma omp parallel for
     for (int i=0; i<dataSize; i++)
         dataZ[i] = dataAlpha * dataX[i] + dataY[i];
 
-    double time = chrono.elapsed();
-    std::cout << "Time: " << time << " s" << std::endl;
-    */
-    //Init OpenCL
-    try
-      {
-	// initialize device, context
-	cl::Device device = opencHelp::getDevice(iPlatform, iDevice);
-	cl::Context context(device);
-	
-	// initialize command queue
-	cl::CommandQueue queue(context, device);
-	
-	// create and write buffers
-	cl::Buffer inputXBuffer(context, CL_MEM_READ_ONLY, dataFullSize);
-	cl::Buffer inputYBuffer(context, CL_MEM_READ_ONLY, dataFullSize);
-	cl::Buffer outputZBuffer(context, CL_MEM_WRITE_ONLY, dataFullSize);
-	queue.enqueueWriteBuffer(inputXBuffer, false, 0, dataFullSize, dataX.data());
-	queue.enqueueWriteBuffer(inputYBuffer, false, 0, dataFullSize, dataY.data());
-	
-	queue.enqueueWriteBuffer(outputZBuffer, false, 0, dataFullSize, dataZ.data());
-	
-	// create and build program
-	std::string kernelSource = opencHelp::readKernelFile("XYZ.cl");
-	cl::Program program = cl::Program(context, kernelSource, true);
-
-	// setup and launch kernel
-	cl::Kernel kernel(program, "xyz"); // kernel "xyz" in file "xyz.cl"
-	kernel.setArg(0, dataAlpha);
-	kernel.setArg(1, inputXBuffer);
-	kernel.setArg(2, inputYBuffer);
-	kernel.setArg(3, outputZBuffer);
-	queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(dataSize), cl::NullRange);
-	// no offset, global size == dataFullSize, local size == 1
-	queue.finish();
-
-	// read results from buffers
-	queue.enqueueReadBuffer(outputZBuffer, true, 0, dataFullSize, dataZ.data());
-
-	
-      }
-    catch (cl::Error error)
-      {
-	std::cerr << "Error: " << error.what() << " -> "
-		  << opencHelp::errorToString(error.err()) << std::endl;
-	exit(-1);
-      }
-
-    
     double time = chrono.elapsed();
     std::cout << "Time: " << time << " s" << std::endl;
 

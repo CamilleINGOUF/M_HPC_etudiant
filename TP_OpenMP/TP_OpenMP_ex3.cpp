@@ -109,21 +109,18 @@ std::vector<unsigned char> computeConvolutionSeparate(
     const int kernel[dk] = { 1,  4,  6,  4,  1 };
 
     //TODO changer algo
-    /*for (int x=dk2; x<width-dk2; x++)
+    for (int x=dk2; x<width-dk2; x++)
       {
         for (int y=dk2; y<height-dk2; y++)
 	  {
             int p = 0;
 	    for (int k=0; k<dk; k++)
 	      {
-                for (int l=0; l<dk; l++)
-		  {
-                    p += kernel[k][l] * ind(data1, width, x-dk2+k, y-dk2+l);
-		  }
+		p += kernel[k] * ind(data1, width, x-dk2+k, y-dk2);
 	      }
             ind(data2, width, x, y) = p / sk;
 	  }
-	  }*/
+      }
 
 
     // TODO
